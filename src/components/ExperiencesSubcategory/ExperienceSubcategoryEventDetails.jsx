@@ -243,7 +243,7 @@ export const ExperienceSubcategoryEventDetails = () => {
       payload.append("OgTitle", pageRecord.ogTitle || "");
       payload.append("OgDesc", pageRecord.ogDesc || "");
       payload.append("SchemaMarkup",pageRecord.schemaMarkup ||"");
-      payload.append("CardTitle",pageRecord.cardTitle ||"");
+      payload.append("CardTitle",pageRecord.cardTitle ||"")
 
       await updateExperienceSubcategoryPage(payload);
       toast.success("Call To Action section updated successfully!");

@@ -24,6 +24,12 @@ const isLandingPagePublished = (item) =>
     ? item.isPublished
     : item.status === StatusType.Active || item.status === StatusType.Published;
 
+// Base URL the public site serves landing pages under. Each row's live URL
+// is this base + the page's `lpUrl` slug.
+const LANDING_PAGE_BASE_URL = "https://meridianbythelawns.com/landing";
+
+const getLandingPageUrl = (lpUrl) => `${LANDING_PAGE_BASE_URL}/${lpUrl}`;
+
 export const ManageLandingPages = () => {
   const navigate = useNavigate();
   const [entriesPerPage, setEntriesPerPage] = useState(30);
@@ -175,6 +181,8 @@ export const ManageLandingPages = () => {
           .action-icon-spaces:hover { background: #bfdbfe; }
           .action-icon-banners { background: #fde2e2; color: #c0392b; }
           .action-icon-banners:hover { background: #fbc4c4; }
+          .action-icon-view { background: #e0f2fe; color: #0369a1; }
+          .action-icon-view:hover { background: #bae6fd; }
         `}
       </style>
       {pageAccessDetails.viewAccess ? (
@@ -244,12 +252,13 @@ export const ManageLandingPages = () => {
                           "#",
                           "LP Title",
                           "LP URL",
+                          "View",
                           "Banquet Hall Title",
                           "Banners",
                           "Gallery",
                           "FAQs",
                           "Testimonials",
-                          "Banquet Spaces",  
+                          "Banquet Spaces",
                           "Status",
                           "Published?",
                           "Action",
@@ -257,15 +266,28 @@ export const ManageLandingPages = () => {
                       />
                       <tbody className="manage-page-group-table-values p-3">
                         {paginatedLandingPages.length === 0 ? (
-                          <TableDataStatusError colspan="12" />
+                          <TableDataStatusError colspan="13" />
                         ) : (
                           paginatedLandingPages.map((item, index) => (
                             <tr key={item.id}>
                               <td>{(currentPage - 1) * entriesPerPage + index + 1}</td>
                               <td>{item.lpTitle}</td>
                               <td>{item.lpUrl}</td>
-                              <td>{item.banquetHallTitle}</td>
+
+                              <td className="text-center">
                                 
+                                 <a  href={getLandingPageUrl(item.lpUrl)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="action-icon-btn action-icon-view"
+                                  title="View Live Page"
+                                >
+                                  <i className="ri-external-link-line"></i>
+                                </a>
+                              </td>
+
+                              <td>{item.banquetHallTitle}</td>
+
                               <td className="text-center">
                                 <button
                                   type="button"
@@ -323,7 +345,6 @@ export const ManageLandingPages = () => {
                                   <i className="ri-layout-grid-line"></i>
                                 </button>
                               </td>
-
 
                               <td>
                                 <span
