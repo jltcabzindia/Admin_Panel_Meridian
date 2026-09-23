@@ -20,6 +20,15 @@ const buildImageUrl = (path) => {
   return `${IMAGE_BASE_URL}${path.replace(/^\/+/, '')}`;
 };
 
+// Turns "Enter Experience Subcategory Name" into "enter-experience-subcategory-name".
+const slugify = (str) =>
+  str
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')   // strip special chars
+    .replace(/\s+/g, '-')           // spaces -> hyphens
+    .replace(/-+/g, '-');           // collapse repeats
+
 const EMPTY_FORM = {
   experienceCategoryId: '',
   experienceSubcategoryName: '',
@@ -139,6 +148,11 @@ export const AddExperienceSubcategory = ({ editMode = false, initialData = {}, o
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [experienceCategories, setExperienceCategories] = useState([]);
 
+  // Whether the user has typed directly into the URL field (or we're in edit
+  // mode with an existing URL). While false, the URL is auto-derived from
+  // the name field; once true, auto-generation stops touching it.
+  const [urlManuallyEdited, setUrlManuallyEdited] = useState(false);
+
   // The actual File object selected for upload (kept separate from formData
   // since it isn't a plain form value).
   const [imageFile, setImageFile] = useState(null);
@@ -169,6 +183,9 @@ export const AddExperienceSubcategory = ({ editMode = false, initialData = {}, o
             experienceSubcategoryShortDesc: data.experienceSubcategoryShortDesc || '',
             displayOrder: data.displayOrder ?? '',
           });
+          // Existing record already has a real URL — don't let further name
+          // edits silently regenerate/overwrite it.
+          setUrlManuallyEdited(true);
           setImageFile(null);
           setImagePreview(buildImageUrl(data.experienceSubcategoryImage));
         } catch (error) {
@@ -176,6 +193,7 @@ export const AddExperienceSubcategory = ({ editMode = false, initialData = {}, o
         }
       } else {
         setFormData(EMPTY_FORM);
+        setUrlManuallyEdited(false);
         setImageFile(null);
         setImagePreview('');
       }
@@ -194,6 +212,25 @@ export const AddExperienceSubcategory = ({ editMode = false, initialData = {}, o
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'experienceSubcategoryUrl') {
+      // User is typing directly into the URL field — stop auto-generating.
+      setUrlManuallyEdited(true);
+      setFormData((prevData) => ({ ...prevData, experienceSubcategoryUrl: value }));
+      return;
+    }
+
+    if (name === 'experienceSubcategoryName') {
+      setFormData((prevData) => ({
+        ...prevData,
+        experienceSubcategoryName: value,
+        experienceSubcategoryUrl: urlManuallyEdited
+          ? prevData.experienceSubcategoryUrl
+          : slugify(value),
+      }));
+      return;
+    }
+
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
@@ -265,6 +302,7 @@ export const AddExperienceSubcategory = ({ editMode = false, initialData = {}, o
           setIsButtonDisabled(false);
         }
         setFormData(EMPTY_FORM);
+        setUrlManuallyEdited(false);
         setImageFile(null);
         setImagePreview('');
         if (onSuccess) onSuccess();
@@ -281,6 +319,7 @@ export const AddExperienceSubcategory = ({ editMode = false, initialData = {}, o
     setFormData(EMPTY_FORM);
     setErrors({ experienceCategoryId: '', experienceSubcategoryName: '', experienceSubcategoryUrl: '', displayOrder: '' });
     setApiError('');
+    setUrlManuallyEdited(false);
     setImageFile(null);
     setImagePreview('');
     setSelectedPageGroup(null);
