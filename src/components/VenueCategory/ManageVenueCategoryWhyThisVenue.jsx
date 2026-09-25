@@ -25,7 +25,6 @@ import { getTinyMceInit } from "../../utils/tinymceConfig";
 
 // NOTE: replace with your own TinyMCE Cloud API key, or switch to a
 // self-hosted TinyMCE bundle if you don't want to depend on the cloud CDN.
-const TINYMCE_API_KEY = "your-api-key";
 
 const initialWhyFormState = {
   Id: null,
