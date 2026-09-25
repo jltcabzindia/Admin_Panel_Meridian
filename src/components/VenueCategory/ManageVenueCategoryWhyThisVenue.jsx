@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import { Editor } from "@tinymce/tinymce-react";
+
 
 import {
   addVenueCategoryWhyThisVenue,
@@ -20,6 +20,8 @@ import { confirmDelete } from "../Common/OtherElements/confirmDeleteClone";
 import { Loading } from "../Common/OtherElements/Loading";
 import { TableDataStatusError } from "../Common/OtherElements/TableDataStatusError";
 import TableHeader from "../Common/TableComponent/TableHeader";
+import { Editor } from "@tinymce/tinymce-react";
+import { getTinyMceInit } from "../../utils/tinymceConfig";
 
 // NOTE: replace with your own TinyMCE Cloud API key, or switch to a
 // self-hosted TinyMCE bundle if you don't want to depend on the cloud CDN.
@@ -319,30 +321,11 @@ payload.append("SchemaMarkup",pageRecord.schemaMarkup ||"")
                 <label className="form-label">
                   Section 5 Description <span className="required-field">*</span>
                 </label>
-               <Editor
-  apiKey={TINYMCE_API_KEY}
+              <Editor
+  tinymceScriptSrc="/tinymce/tinymce.min.js"
   value={sectionFormData.Section5Desc}
   onEditorChange={handleSection5DescChange}
-  init={{
-    height: 300,
-    menubar: false,
-    branding: false,
-    plugins: [
-      "advlist",
-      "autolink",
-      "lists",
-      "link",
-      "charmap",
-      "preview",
-      "searchreplace",
-      "visualblocks",
-      "wordcount",
-      "code",
-    ],
-    toolbar:
-      "undo redo | formatselect | bold italic underline | " +
-      "alignleft aligncenter alignright | bullist numlist | link | removeformat | code",
-  }}
+  init={getTinyMceInit({ height: 300 })}
 />
                 {sectionErrors.Section5Desc && (
                   <div className="invalid-feedback d-block">{sectionErrors.Section5Desc}</div>
